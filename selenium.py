@@ -11,6 +11,14 @@ CHROME_DRIVER = {
     "win32": "chromedriver_win32.zip",
 }
 
+CHROME_DRIVER_EXEC = {
+    "linux": "chromedriver.exe",
+    "darwin": "chromedriver",
+    "darwin_arm64": "chromedriver",
+    "win32": "chromedriver",
+}
+
+
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; WOW64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.6788.76 Safari/537.36"
 
 
@@ -18,16 +26,16 @@ def get_driver():
     os_name = platform.system().lower()
 
     if os_name == "linux":
-        return CHROME_DRIVER["linux"]
+        return CHROME_DRIVER["linux"], CHROME_DRIVER_EXEC["linux"]
     elif os_name == "windows":
-        return CHROME_DRIVER["win32"]
+        return CHROME_DRIVER["win32"], CHROME_DRIVER_EXEC["win32"]
     elif os_name == "darwin":
         # Check for macOS architecture (x86_64 or arm64)
         arch = platform.machine().lower()
         if "arm64" in arch or "aarch64" in arch:
-            return CHROME_DRIVER["darwin_arm64"]
+            return CHROME_DRIVER["darwin_arm64"], CHROME_DRIVER_EXEC["darwin_arm64"]
         else:
-            return CHROME_DRIVER["darwin"]
+            return CHROME_DRIVER["darwin"], CHROME_DRIVER_EXEC["darwin"]
     else:
         raise ValueError("could not determine os type")
 
@@ -72,7 +80,7 @@ if __name__ == "__main__":
     driver_dir.mkdir(exist_ok=True)
 
     # check os
-    driver = get_driver()
+    driver, _ = get_driver()
 
     # download
     download_file(f"{base_url}/{driver}", driver_dir / driver)
