@@ -18,6 +18,25 @@ CHROME_DRIVER_EXEC = {
     "win32": "chromedriver",
 }
 
+CHROMIUM_DEFAULT_PATH = {
+    "win32": [
+        Path("C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"),
+    ],
+    "linux": [
+        Path("/usr/bin/google-chrome"),
+        Path("/usr/bin/chromium-browser"),
+        Path("/usr/bin/chromium"),
+        Path("/opt/google/chrome/chrome"),
+    ],
+    "darwin": [
+        Path("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"),
+        Path("/Applications/Chromium.app/Contents/MacOS/Chromium"),
+    ],
+    "darwin_arm64": [
+        Path("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"),
+        Path("/Applications/Chromium.app/Contents/MacOS/Chromium"),
+    ],
+}
 
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; WOW64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.6788.76 Safari/537.36"
 
@@ -26,16 +45,32 @@ def get_driver():
     os_name = platform.system().lower()
 
     if os_name == "linux":
-        return CHROME_DRIVER["linux"], CHROME_DRIVER_EXEC["linux"]
+        return (
+            CHROME_DRIVER["linux"],
+            CHROME_DRIVER_EXEC["linux"],
+            CHROMIUM_DEFAULT_PATH["linux"],
+        )
     elif os_name == "windows":
-        return CHROME_DRIVER["win32"], CHROME_DRIVER_EXEC["win32"]
+        return (
+            CHROME_DRIVER["win32"],
+            CHROME_DRIVER_EXEC["win32"],
+            CHROMIUM_DEFAULT_PATH["win32"],
+        )
     elif os_name == "darwin":
         # Check for macOS architecture (x86_64 or arm64)
         arch = platform.machine().lower()
         if "arm64" in arch or "aarch64" in arch:
-            return CHROME_DRIVER["darwin_arm64"], CHROME_DRIVER_EXEC["darwin_arm64"]
+            return (
+                CHROME_DRIVER["darwin_arm64"],
+                CHROME_DRIVER_EXEC["darwin_arm64"],
+                CHROMIUM_DEFAULT_PATH["darwin_arm64"],
+            )
         else:
-            return CHROME_DRIVER["darwin"], CHROME_DRIVER_EXEC["darwin"]
+            return (
+                CHROME_DRIVER["darwin"],
+                CHROME_DRIVER_EXEC["darwin"],
+                CHROMIUM_DEFAULT_PATH["darwin"],
+            )
     else:
         raise ValueError("could not determine os type")
 
@@ -80,7 +115,7 @@ if __name__ == "__main__":
     driver_dir.mkdir(exist_ok=True)
 
     # check os
-    driver, _ = get_driver()
+    driver, _, _ = get_driver()
 
     # download
     download_file(f"{base_url}/{driver}", driver_dir / driver)
